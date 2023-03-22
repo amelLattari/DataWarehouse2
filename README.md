@@ -1,6 +1,7 @@
 # Bioinfo Project 2023
-## UPDATE DATE: 16 March 2023
-
+## UPDATE 22 Match 2023
+>Adding examples in Step 1 "make your first functions"
+## UPDATE 16 March 2023
 >Adding code example for Step 1. 
 
 This repository contains materials for the bioinfomatics project (2023 L3 INFO Paris-Saclay).
@@ -125,20 +126,54 @@ for child in xroot.iter("{http://www.ncbi.nlm.nih.gov/geo/info/MINiML}Sample"):
 ```
 
 ## Make first preprocessing functions
-By now, you should already have at least one class in your code, with associated getters and setters. 
+By now, you should already have at least one class in your code, with associated getters and setters.
+By getters and setters I mean methods that should be used to access to the attributes of instances. 
+Good pratice is to prevent the direct access of the instance attributes, so that you can control the way they can be update. 
+To do this in python, you can use the prefixe "__" before the attribute name. 
+```python
+class ALS_RNAseq:
+    def __init__(self):
+        self.__data_matrix = []
+```
+This way, the attribute "__data_matrix" can not be change or even read outside of the class. 
+A getter (or setter) method need to be developped for this purpose. 
+```python
+class ALS_RNAseq:
+    def __init__(self):
+        self.__data_matrix = []
+
+    def get_data_matrix(self):
+        return self.__data_matrix
+```
+In this example, the getter method have no real interest, but anyway it is good pratice. 
 Think about other preprocessing functions that could usefull for the next steps. 
-For example, functions that can check if you have all needed annotations, or function that can subset your data based on some annotation criteria (i.e., get the subdataframe the "control" samples only). 
+For example, functions that can check if you have all needed annotations, or function that can subset your data based on some annotation criteria (i.e., get the subdataframe the "control" samples only). Or functions that modified one attribute (e.g., the data matrix) and update accordingly the other attributes (e.g., the annotations).
+
+At last, you may want a convient way to "check" or look at your objects. 
+Therefore a "print" function can be defined. 
+By simply defining a "__str__" method in your class you can change the behevior of the "print" function when used with your class objects. 
+```python
+class ALS_RNAseq:
+    def __init__(self):
+        self.__data_matrix = []
+
+    def get_data_matrix(self):
+        return self.__data_matrix
+    
+    def __str__(self):
+        return "put here what you want to print"
+```
 
 # Step 2 - Descriptive analysis
 The descriptive analysis covers all kind of analyses that are direct description of the data, such as computing mean, standard deviation, histogram, boxplot...
 
 ## RNA counts description:
-For each gene, compute the mean, the median and the standard deviation. Find a way to efficiently report all those data, and make your first interpretation. *Spoiler* : you may have to transform/manipulate the data.
+For each gene, compute the mean (across all samples), the median and the standard deviation. Find a way to efficiently report all those data, and make your first interpretation. *Spoiler* : you may have to use graphs and transform/manipulate the data.
 
-Samples correspond to different individuals, to ALS or control individuals etc... Think about what kind of subsets you could analyse and why (and do the analysis!).
+Samples correspond to different individuals, to ALS or control individuals etc... Think about what kind of subsets you could analyse and why (and do the descriptive analysis for those subsets).
 
 ## Samples description:
-For each sample, compute the mean, the median, the standard deviation. Find a way to efficiently report all those data. As for the RNA counts, think about which subsets you can analyse. 
+For each sample, compute the mean (across all genes), the median, the standard deviation. Find a way to efficiently report all those data. As for the RNA counts, think about which subsets you can analyse. 
 
 ## Start your report
 At this step, you should have already begin your report. 
