@@ -1,8 +1,10 @@
 # Bioinfo Project 2023
+## UPDATE 29 March 2023 Bis
+> Add PCA normalization explanation and code.
 ## UPDATE 29 March 2023
 > Reorder the "descriptive analysis" step and add explanation in the "sample description" section.
 ## UPDATE 22 March 2023
->Adding examples in Step 1 "make your first functions"
+>Adding examples in Step 1 "make your first functions".
 ## UPDATE 16 March 2023
 >Adding code example for Step 1. 
 
@@ -198,11 +200,22 @@ Scikit-learn is a wonderfull Python library, and contains a lot of "must-have" f
 Take some time to visite the official [website.](https://scikit-learn.org/stable/)
 For a pratical python PCA tutorial, let's check again a [Josh Starmer's video](https://www.youtube.com/watch?v=Lsue2gEM9D0&ab_channel=StatQuestwithJoshStarmer).
 
+Before doing a PCA on your data, it is mandatory to "center" your data (so that each gene has a mean equal to zero) and it is advise to "scale" your data (so that each gene has a standard deviation of 1).
+This way, you ensure that the PCA is accuratly done (with the centering) and all genes are considered base on their relative variability (with the scaling) and not their absolute value. It is not advise to consider multiple variables with different scale all together.
+
+You can use the following code before doing a PCA (X will be used in the PCA after this code)
+
+```python
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X = scaler.fit_transform(my_data) # my_data being your dataframe containing your genes in column and samples in raw
+```
+
 Now, perform a PCA and plot the samples using their coordinates in the first PCs. 
 TIPs: to select the good number of PCs, compute the percenatage of variance their capture.
 Use the annotations to color your plots, and see if you can already observe some kind of signal.
 
-PCA is also good way to find outliers. 
+(Bonus) PCA is also good way to find outliers. 
 Outliers are samples that are greatly different from the other samples. 
 The difference should be "huge", so that only experimental errors could explain it.
 Using the PCA and visualization, look at possible outliers.
