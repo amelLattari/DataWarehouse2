@@ -1,5 +1,7 @@
 # Bioinfo Project 2023
-## UPDATE 22 Match 2023
+## UPDATE 29 March 2023
+> Reorder the "descriptive analysis" step and add explanation in the "sample description" section.
+## UPDATE 22 March 2023
 >Adding examples in Step 1 "make your first functions"
 ## UPDATE 16 March 2023
 >Adding code example for Step 1. 
@@ -167,13 +169,18 @@ class ALS_RNAseq:
 # Step 2 - Descriptive analysis
 The descriptive analysis covers all kind of analyses that are direct description of the data, such as computing mean, standard deviation, histogram, boxplot...
 
+## Samples description:
+For each sample, compute the mean (across all genes), the median, the standard deviation. Find a way to efficiently report all those data.
+
+Use the annotation data to describe your whole dataset. How many "disease groups", how many sample "sources", how many samples per individual etc... 
+This description should guide you for the next step, in order to either correctly group your data when comparing subsets of samples or to avoid potential bias.
+
+You should output all information relative to the samples concisely, so that we have a full (but summarize) view of our sample.
+
 ## RNA counts description:
 For each gene, compute the mean (across all samples), the median and the standard deviation. Find a way to efficiently report all those data, and make your first interpretation. *Spoiler* : you may have to use graphs and transform/manipulate the data.
 
 Samples correspond to different individuals, to ALS or control individuals etc... Think about what kind of subsets you could analyse and why (and do the descriptive analysis for those subsets).
-
-## Samples description:
-For each sample, compute the mean (across all genes), the median, the standard deviation. Find a way to efficiently report all those data. As for the RNA counts, think about which subsets you can analyse. 
 
 ## Start your report
 At this step, you should have already begin your report. 
@@ -201,8 +208,8 @@ The difference should be "huge", so that only experimental errors could explain 
 Using the PCA and visualization, look at possible outliers.
 
 # Step 4 - tSNE and UMAP
-Another (more recent) good vizualization tool for high dimensional data is the [t-SNE](https://www.youtube.com/watch?v=NEaUSP4YerM&ab_channel=StatQuestwithJoshStarmer), and it's little brother, the [UMAP](https://www.youtube.com/watch?v=eN0wFzBA4Sc&t=482s&ab_channel=StatQuestwithJoshStarmer). 
-The advantage of this two methods is that they can reduce the dimension of your data using a desired number of of component (2 most of the time), not leaving alway a part of your data variability (in theory). 
+Another (more recent) good vizualization tool for high dimensional data is the [t-SNE](https://www.youtube.com/watch?v=NEaUSP4YerM&ab_channel=StatQuestwithJoshStarmer), and its little brother, the [UMAP](https://www.youtube.com/watch?v=eN0wFzBA4Sc&t=482s&ab_channel=StatQuestwithJoshStarmer). 
+The advantage of this two methods is that they can reduce the dimension of your data using a desired number of components (2 most of the time), not (too much) leaving alway a part of your data variability (in theory). 
 On the other hand, they do not preserve large distance interpretation, so that only "local similarities" must be interpreted (e.g., outliers are much more difficult to spot). 
 UMAP tends to preserve much better large distances, but still not reach the PCA in this topic.
 
@@ -211,12 +218,11 @@ UMAP can be implemented using the "umap" module, whereas t-SNE has a scikit-lear
 
 Compare this visualition vs the PCA one.
 
-
 # Step 5 - Univariate analysis
 We have started to explore our data by computing basic statistics, making visualizations etc... 
 Now it's time to perform more advanced analyses, making use of more advanced statistical background. 
 
-In modern datascience, we are used to manipulate complexe algorithm, like ensemble methods or even more complex methods, like deep learning algorithms. 
+In modern datascience, we are used to manipulate complexe algorithms, like ensemble methods or even more complex methods, like deep learning algorithms. 
 However, results found using those algorithms can be hard to interpret.
 Therefore, standard univariate analyses are always a good idea to start a data analysis. 
 From all univariate analyses, the student-test, or t-test, (and in less extend the wilcoxon test) is one of the simplest and powerful method. 
