@@ -54,6 +54,17 @@ The criteria for evaluation will be (in order):
 - Relevance of the code,
 - Results found.
 
+## Last Session:
+The last session (12th April 2023) will be a "presentation session":
+- 15 minutes
+- Present the current state of your work
+- Present what you are going to do after (unless you have finished the project)
+- Bring your code and draft report.
+
+You don't have to prepare slides or other supports.
+
+Plan to speak ~5 minutes (=> ~10 minutes of Q&A).
+
 ## Mandatory general instructions:
 - The programming language used must be Python (and only Python),
 - No dependencies other than Python modules should be used (Jupiter notebooks accepted),
