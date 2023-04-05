@@ -1,10 +1,20 @@
 # Bioinfo Project 2023
+## UPDATE 4 APRIL 2023
+> Add more explanation in STEP 5.
+
+> Add code in STEP 5 for T-test ALS vs Control samples.
+
+> Add STEP 6 (Elastic-Net) and a new dataset
+
 ## UPDATE 29 March 2023 Bis
 > Add PCA normalization explanation and code.
+
 ## UPDATE 29 March 2023
 > Reorder the "descriptive analysis" step and add explanation in the "sample description" section.
+
 ## UPDATE 22 March 2023
 >Adding examples in Step 1 "make your first functions".
+
 ## UPDATE 16 March 2023
 >Adding code example for Step 1. 
 
@@ -208,7 +218,7 @@ You can use the following code before doing a PCA (X will be used in the PCA aft
 ```python
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
-X = scaler.fit_transform(my_data) # my_data being your dataframe containing your genes in column and samples in raw
+X = scaler.fit_transform(my_data) # my_data being your dataframe containing your genes in column and samples in row
 ```
 
 Now, perform a PCA and plot the samples using their coordinates in the first PCs. 
@@ -220,7 +230,7 @@ Outliers are samples that are greatly different from the other samples.
 The difference should be "huge", so that only experimental errors could explain it.
 Using the PCA and visualization, look at possible outliers.
 
-# Step 4 - tSNE and UMAP
+# Step 4 - tSNE and UMAP (optional)
 Another (more recent) good vizualization tool for high dimensional data is the [t-SNE](https://www.youtube.com/watch?v=NEaUSP4YerM&ab_channel=StatQuestwithJoshStarmer), and its little brother, the [UMAP](https://www.youtube.com/watch?v=eN0wFzBA4Sc&t=482s&ab_channel=StatQuestwithJoshStarmer). 
 The advantage of this two methods is that they can reduce the dimension of your data using a desired number of components (2 most of the time), not (too much) leaving alway a part of your data variability (in theory). 
 On the other hand, they do not preserve large distance interpretation, so that only "local similarities" must be interpreted (e.g., outliers are much more difficult to spot). 
@@ -235,15 +245,136 @@ Compare this visualition vs the PCA one.
 We have started to explore our data by computing basic statistics, making visualizations etc... 
 Now it's time to perform more advanced analyses, making use of more advanced statistical background. 
 
-In modern datascience, we are used to manipulate complexe algorithms, like ensemble methods or even more complex methods, like deep learning algorithms. 
+In modern datascience, we are used to manipulate complexe algorithms, like regression, ensemble methods or even more complex methods (like deep learning algorithms). 
 However, results found using those algorithms can be hard to interpret.
-Therefore, standard univariate analyses are always a good idea to start a data analysis. 
-From all univariate analyses, the student-test, or t-test, (and in less extend the wilcoxon test) is one of the simplest and powerful method. 
+Therefore, standard univariate analyses are always a good idea to start an analysis. 
+From all univariate analyses, the student-test, or t-test, (and in less extend the wilcoxon test) is one of the simplest and powerful method when applicable (it is in our case). 
 This test rests on [hypothesis testing](https://www.youtube.com/watch?v=0oc49DyA3hU), making interpretation extremely straightforward (thanks to the sacrosanct [p-value](https://www.youtube.com/watch?v=vemZtEM63GY))
 
-The t-test compare the means of a selected variable (here RNA counts) of two different groups (e.g., control vs ALS persons). 
-Therefore, to investigate the data using a test, you will have to perform one t-test per gene, resulting in as many results as genes.
-In your opinion, could this be a problem? 
+### T-test implementation
+The t-test compare the means of a selected variable (here one gene) of two different groups (e.g., control vs ALS persons). 
+Therefore, to investigate the data using a t-test, we need to perform one t-test per gene, resulting in as many results as genes.
 To implement a t-test and other frequestist tests, [scipy.stats](https://docs.scipy.org/doc/scipy/reference/stats.html) contains a good sets of functions.
 
-## TO BE CONTINUED
+Let's say we want to compare the mean count of RNA of ALS subjects against the mean count of RNA of control subjects for the first gene in our dataset. 
+We first need to keep the first column only:
+```python
+first_gene = data_matrix.iloc[:,0] # with data_matrix a dataframe containing the RNA count, with samples in row and genes in column 
+```
+Then, split the column into two series, one for ALS subjects, and one for control subjects:
+```python
+als_index = data_annotation['Group'] == "ALS Spectrum MND" # with data_annotation the dataframe containing the annotation
+ctrl_index = data_annotation['Group'] == "Non-Neurological Control"
+first_gene_als = first_gene[als_index.values]
+first_gene_ctrl = first_gene[ctrl_index.values]
+```
+Finally we compare the two series using a t-test and we get the p-value:
+```python
+from scipy.stats import ttest_ind
+pvalue_first_gene = ttest_ind(first_gene_als, first_gene_ctrl).pvalue
+```
+
+### T-test for each gene
+Obviously we need to put that code in a loop or any code that will perform the t-test iteratively on each column/gene. 
+One way to do this is to use a for loop.
+Another way is to use the ".apply" method of pandas dataframe (if your data_matrix is a pandas dataframe):
+```python
+pvalues = data_matrix.apply(lambda x: ttest_ind(x[als_index.values], x[ctrl_index.values]).pvalue)
+```
+
+### Multiple testing
+The p-values give the probability to obtain the observed the difference in mean of the RNA count if there is actually no difference in reality. 
+So low p-values can be interpreted as: "unexpected observations". 
+However, the more observations we make, the more likely we are to have surprising observations.
+So we should account for the "multiple testing" we do.
+In general, when exploring data (and not looking for a confirmation), controling the false discovery rate (fdr) is the way to go. 
+The fdr "limits" the number of false positive discoveries. 
+For example, a fdr of 5% tries to ensure that only 5% of our results will be false positives. 
+To correct (raw) p-values using fdr, we can use the "statsmodels.stats.multitest.multipletests" function with the "method" parameters equals to "fdr_bh".
+
+### Graphical representation
+P-values are computed using 3 factors:
+- the difference in mean
+- the standard deviation(s)
+- the number of samples in each groups
+
+The first factor (difference in mean) is what we can call the "effect". 
+The two other factors will determine some kind of confidence for the first factor (how much the effect is trustable). 
+So we can have huge effects with relatively high p-values, and small effect with low p-values. In biology, we always look at big and significant effect first (i.e., big difference, low p-value).
+A good way to report results is to use the [volcano plot](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)). 
+
+## STEP 6 - Multivariate Analysis - Elastic-Net
+The t-test is an excellent tool because it offers a way to estimate the relevance of each gene (to distinguish ALS vs control samples for example). 
+With this analysis, we are able to rank the genes from the most relevant to the less usefull for our question.
+However, this analysis looks at the genes one by one, and doesn't try to take advantage of gene combinations. 
+
+We can extend the t-test (using multiple genes simultaneously) with the help of logistic regression. 
+The idea behind a logistic regression is to use the RNA counts of a sample as variables (for all genes) and try to predict the sample group (ALS or control for example).
+To do so, we try to find a linear combination of the variables that compute a probability for each possible classes (ALS or control).
+
+Regularized logistic regressions are extentions of standard logistic regressions that penalized variables with no clear interest.
+In another words, they try to attribute a coefficient of 0 to variables with low interest (no useful signal).
+Therefore this methods are very good candidates for biomarker selections. 
+
+Among these regularized regressions, [elastic-net](https://www.youtube.com/watch?v=1dKRdX9bfIo&ab_channel=StatQuestwithJoshStarmer) is one of the most versatile. 
+It can handle "wide" dataset (more variables than samples), correlation (do not have to choose between very similar variables) and are easily configurable (parameter tuning).
+
+Warning: like the PCA, the elastic-net algorithm takes multiple variables into account. 
+Therefore, variables with high values and high standard deviation can introduce bias (being artifically more important). 
+So, like PCA, I advise you to normalize the data before using elastic-net.
+
+(Optional) Also, you can also use the output of the PCA and perform the elastic-net on this transformed data.
+Interpretations will be more difficult (you will have to look at loadings of your components at the end of the analysis) but potentially more powerfull.
+
+### Elastic-Net implementation
+You can use the method "LogisticRegression" from scikitlearn (sklearn.linear_model) to implement an elastic-net analysis:
+```python
+from sklearn.linear_model import LogisticRegression
+elasticNet = LogisticRegression(penalty='elasticnet', solver='saga', l1_ratio=0.5, C=0.5).fit(x, y)
+```
+Where x contains the data and y the groups (2 groups only).
+Two parameters can be fine tune: 
+- l1_ratio: the ration between l1 and l2 regularizations
+- C: inverse of regularization strength
+
+### Fine tuning of parameters
+To fine tune parameters while avoiding overfitting, we can perform a [cross validation](https://www.youtube.com/watch?v=fSytzGwwBVw&ab_channel=StatQuestwithJoshStarmer): 
+```python
+from sklearn.linear_model import LogisticRegression
+elasticNet = LogisticRegressionCV(penalty='elasticnet', cv= 3, solver='saga', l1_ratios=[0.25,0.5,0.75], Cs=[0.1,0.5], scoring= 'accuracy').fit(x, y)
+```
+You have to specify the number of folds (here cv=3). 
+Choose a number of fold adapted to the data. 
+By default, the folds are stratified (they split the dataset taking the class balance into account, something that we absolutely want here).
+
+You also have to specify the scoring function used to evaluate and compare the models (accuracy in this example). 
+Check the [documentation](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics) to get a list of scoring functions and choose one adapted to the our data.
+Have a special look to [balanced accuracy](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html#sklearn.metrics.balanced_accuracy_score), [f1 score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [ROC AUC](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score), and [the matthews correlation coefficient](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.matthews_corrcoef.html#sklearn.metrics.matthews_corrcoef).
+
+Once you have your elastic-net model (with the best parameters), you can look at its overall performance.
+```python
+model_prediction = elasticNet.predict(x)
+accuracy_train_dataset = sklearn.metrics.accuracy_score(y, model_prediction)
+```
+Here I used the accuracy metric, but remember to use (at least) the metric you used during the tuning.
+
+### Testing your model
+We built and evaluated our model on the same dataset. 
+Even if we used a cross-validation to choose the parameters, the final model used all the avalaible data. 
+Therefore we have no idea how the model performs on new data. 
+For this purpose, we need a "test set". 
+
+Download the "data set", process the data (warning: there might be some differences in the xml file) and use this new dataset to evaluate the model.
+I advise you to use different scores (begining with the one used to choose the parameters).
+
+### Get the best genes
+The elastic-net model contains (by definition) all the coefficients of the regression, i.e., the importance of each gene to differentiate the ALS samples from the control samples.
+```python
+elasticNet.coef_
+```
+You can rank these coefficients (using their absolute values) to obtain a good list of candidates.
+
+
+
+
+
