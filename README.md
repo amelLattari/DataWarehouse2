@@ -1,6 +1,6 @@
 # Bioinfo Project 2023
 ## UPDATE 5 APRIL 2023
-> 
+> Add limit date for report
 
 ## UPDATE 4 APRIL 2023
 > Add more explanation in STEP 5.
