@@ -1,4 +1,8 @@
 # Bioinfo Project 2023
+## UPDATE 11 APRIL 2023
+> Add Step 7, xgboost, with code example
+> Add Step 8
+
 ## UPDATE 5 APRIL 2023
 > Add limit date for report
 
@@ -392,7 +396,39 @@ elasticNet.coef_
 ```
 You can rank these coefficients (using their absolute values) to obtain a good list of candidates.
 
+## STEP 7 - XGBOOST (Optional)
+There are many other methods to analyze multivariate data, and some of them are more or less equivalent. 
+A different class of methods compare to the regularization regression is the class of decision tree based methods. 
+Among this class, the "ensemble" classes, i.e., using a set of decision trees, are very used nowadays because they are very powerful.
+In particular, the xgboost method is extremely popular and used in pretty much all data analysis competitions.
+For a detailled explanation refer to this link [xgboost explanation](https://www.youtube.com/watch?v=OtD8wVaFm6E&ab_channel=StatQuestwithJoshStarmer).
 
+The xgboost implementation for biomarker selection is pretty straightforward using the package xgboost: 
+```python
+from xgboost import XGBClassifier
+model = XGBClassifier()
+model.fit(X_train, y) # xtrain is your data matrix, and y is your group labels (ctrl or ALS)
+```
+Then you can extract the feature (=gene) importance of your model:
+```python
+print(model.feature_importances_)
+```
+You can also used the built-in funtion to plot the feature importance: 
+```python
+from xgboost import plot_importance
+plot_importance(model)
+```
+As for the elastic-net, remember to:
+- Standardized your data
+- Test your model on an independant test data set (there is no fine tuning in the previous code, so cross validation is not mandatory)
+
+## STEP 8 (final)- Report your results
+At this step, you should have different lists of candidate biomarkers. 
+Propose a final ranked list, making use of all your results, containing the TOP "100" candidates.
+This list will be compared to the state of art of ALS biomarkers but also other related diseases.
+The state of art lists will be avalaible in this repository after the 4 may. 
+
+Good luck !
 
 
 
